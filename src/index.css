@@ -48,4 +48,11 @@ body {
   .game-info {
     margin-left: 20px;
   }
-  
+
+  .list-item-selected{
+    float: left;
+    font-weight: bold;
+  }
+  .square.highlight {
+    background: coral
+  }

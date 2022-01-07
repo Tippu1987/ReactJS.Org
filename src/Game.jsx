@@ -10,8 +10,7 @@ export default class Game extends React.Component {
             history: [{ squares: Array(9).fill(null) }],
             xIsNext: true,
             stepNumber: 0,
-            row:null,
-            col:null,
+            isAscending:true,
         };
     }
 
@@ -34,24 +33,31 @@ export default class Game extends React.Component {
         const history = this.state.history;
         var current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
-        const moves = history.map((step, move) => {
+        let moves = history.map((step, move) => {
             const r=1+Math.floor(step.lastClickedSquare/3);
             const c=1+step.lastClickedSquare%3;
             const desc = move ? `Go to move # ${move} (${r},${c})`:
                 'Go to Game start';
+            
             return (
-                <li key={move}>
+                <li key={move} className={move===this.state.stepNumber?'list-item-selected':''}>
                     <button onClick={() => this.jumpTo(move)}>{desc}</button>
                 </li>
             );
         });
-
+        if(!this.state.isAscending) moves.reverse();
         let status;
         if (winner) {
-            status = 'winner is : ' + winner;
+            status = 'winner is : ' + current.squares[winner[0]] + '; Win Squares are ('+winner[0]+','+winner[1]+','+winner[2]+')';
+            
         }
         else {
-            status = `Next Player: ${this.state.xIsNext ? 'X' : 'O'}`;
+            if(current.squares.includes(null)){
+                status = `Next Player: ${this.state.xIsNext ? 'X' : 'O'}`;
+            }
+            else{
+                status=`Game is a Tie/Draw`;
+            }
         }
         return (
             <div className="game">
@@ -59,19 +65,26 @@ export default class Game extends React.Component {
                     <Board
                         squares={current.squares}
                         onClick={(i) => this.handleSquareClick(i)}
+                        winSquares={winner}
                     />
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
+                    <button onClick={()=>this.handleSorting()}>{this.state.isAscending?'Ascending':'Descending'}</button>
                     <ol>{moves}</ol>
                 </div>
             </div>
         );
     }
+    handleSorting(){
+        this.setState({
+            isAscending:!this.state.isAscending,
+        });
+    }
     jumpTo(step) {
         this.setState({
             stepNumber: step,
-            xIsNext: step % 2 === 0
+            xIsNext: step % 2 === 0,
         });
     }
 
